@@ -1,8 +1,8 @@
-setwd("/Users/galinakolesova/Documents/Work_in_home/ERY/Work/R_methodics/Sample_207/SBS")
+setwd("")
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-library(nleqslv)
-library(VGAM)
-library(EnvStats)
+library('nleqslv')
+library('VGAM')
+library('EnvStats')
 
 
 calc_delta<-function(x,a,b,m,sd){

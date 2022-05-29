@@ -1,6 +1,5 @@
 ### set working directory:
-setwd("/Users/galinakolesova/Documents/Work_in_home/ERY/Work/R_methodics/Sample_5/Fitting")
-#setwd("C:/Users/Ekaterina/OneDrive/Shared_Mops_Masek/R_script_directory/")
+setwd("")
 ###############################
 #### libraries ################
 ###############################
@@ -94,7 +93,7 @@ sigma_ln<-sqrt(log(sd^2/m^2+1))
 mu_ln<-log(m)-sigma_ln^2/2
 
 
-N_f_sample<-6
+N_f_sample<-5 #207
 
 f_matrix<-matrix(0,nrow = N_f_sample, ncol = length(Times))
 

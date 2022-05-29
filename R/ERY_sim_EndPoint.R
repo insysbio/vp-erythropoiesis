@@ -1,7 +1,7 @@
-setwd("/Users/galinakolesova/Documents/Tishka/Work/R_directory")
+setwd("")
 library(mrgsolve)
 
-IniDataMatrix<-read.table("ERY_param_sel_4000_test.csv", header = TRUE, sep=';', dec = ",")
+IniDataMatrix<-read.table("ERY_param_sel_4000_sample.csv", header = TRUE, sep=';', dec = ",")
 
 #pars<-IniDataMatrix[i,1:2]
 #Npar<-24
@@ -25,14 +25,15 @@ Times<-3e4+c(24,	48,	72,	96,	120,	144,	168,	192,	216,	240,	264,	288,	312,	336,	5
 #Times <- 100*round(Times/100)
 #Times <- c(10,100)
 
-res_1<-matrix(0,nrow = nrow(IniDataMatrix),ncol = length(Times))
+res_1<-matrix(NA,nrow = nrow(IniDataMatrix),ncol = length(Times))
+save_numbers = c()
 #res_2<-matrix(0,nrow = nrow(IniDataMatrix),ncol = length(Times)+1)
 
-#for(i in 1:nrow(IniDataMatrix)){
-  for(i in 1:1){  
+for(i in 1:nrow(IniDataMatrix)){
+  #for(i in 1:1){  
   data<-IniDataMatrix[i,] 
   
-  model_sim <- model %>% 
+  model_sim <- tryCatch((model %>% 
     data_set(data_switch)%>%
     param(data) %>%
     # idata_set(idata) %>%
@@ -52,23 +53,40 @@ res_1<-matrix(0,nrow = nrow(IniDataMatrix),ncol = length(Times))
       end = 3e4+672
       #end = round(30*24*50.4609)
       #end=1e7+37000
-    )
+    )),error=function(e) NA)
   
-  res_1[i,]<-model_sim$RET_pl_norm[which(model_sim$time %in% Times)]
+  if(! is.na(model_sim)){
+    res_1[i,]<-model_sim$RET_pl_norm[which(model_sim$time %in% Times)]
+    save_numbers = c(save_numbers,i)
+  }
   
   #res_2[i,]<-model_sim$Pruritus_score[which(model_sim$time %in% Times)]
   
 }
 
-res_1_1<-res_1[,1:ncol(res_1)]
+res_1_full=res_1
+
+
+res_1 = res_1[save_numbers,]
+res_1_nan <- na.omit(res_1)
+
+#res_1_1<-res_1[,1:ncol(res_1)]
 #res_1<-res_1[,2:ncol(res_1)]
 
-write.csv2(res_1_1,"RET_pl_norm_938.csv",row.names = F)
-#write.csv2(res_2,"Nemo_Pruritus_score_prob.csv",row.names = F)
+write.csv2(res_1,"RET_pl_norm_sample_5.csv",row.names = F)
+write.csv2(res_1_nan,"RET_pl_norm_sample_5_wt_nan.csv",row.names = F)
+write.csv2(save_numbers,"Save_numbers_sample_5.csv",row.names = F)
+write.csv2(res_1_full,"RET_pl_norm_sample_5_full.csv",row.names = F)
 
+###Selection for parameters###
+Full_frame_par_output<-cbind(IniDataMatrix,res_1_full)
+Save_numbers_frame_par_output<-Full_frame_par_output[save_numbers,]
+Save_numbers_frame_par_output_nan<-na.omit(Save_numbers_frame_par_output)
+Save_numbers_frame_par_output_final<-Save_numbers_frame_par_output_nan[,2:56]
+Save_numbers_frame_par_output_final<-Save_numbers_frame_par_output_final[,1:39]
+write.csv2(Save_numbers_frame_par_output_final,"Parameters_sample_success_simulation_SBS.csv",row.names = F)
+
+###Testing plot###
 model_sim$ACC_nle
 plot(model_sim$time[11:236],model_sim$EASI_rel[11:236])
 plot(model_sim, ~EASI)
-
-
-model_sim$time
